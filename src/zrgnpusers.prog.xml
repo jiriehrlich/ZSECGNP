@@ -496,8 +496,8 @@
       <TEXT_NAME>ICON_REPORT</TEXT_NAME>
       <ICON_ID>@AL@</ICON_ID>
       <FUN_TEXT>Compliance Report</FUN_TEXT>
-      <ICON_TEXT>Compliance Report</ICON_TEXT>
-      <INFO_TEXT>Compliance Report</INFO_TEXT>
+      <ICON_TEXT>Compliance Reports</ICON_TEXT>
+      <INFO_TEXT>Compliance Reports</INFO_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>CONFIG</CODE>
@@ -672,7 +672,6 @@
       <TEXT_NAME>ICON_INFORMATION</TEXT_NAME>
       <ICON_ID>@0S@</ICON_ID>
       <FUN_TEXT>INFORMATION</FUN_TEXT>
-      <ICON_TEXT>Documentation</ICON_TEXT>
       <INFO_TEXT>Documentation</INFO_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
@@ -689,8 +688,7 @@
       <TEXT_NAME>ICON_EXECUTE_OBJECT</TEXT_NAME>
       <ICON_ID>@15@</ICON_ID>
       <FUN_TEXT>Execute</FUN_TEXT>
-      <ICON_TEXT>Maintenance</ICON_TEXT>
-      <INFO_TEXT>Maintenance</INFO_TEXT>
+      <INFO_TEXT>Execute</INFO_TEXT>
       <PATH>E</PATH>
       <USAGE>P</USAGE>
      </RSMPE_FUNT>

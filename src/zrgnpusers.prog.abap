@@ -16,12 +16,15 @@ types:
   begin of g_type_s_outtab.
     include type zgnpusers.
   types:
+    uar_age(4)       type c,
+    uar_status       type icon_d,
     pwd_status       type icon_d,
-    pwd_age          type i,
+    pwd_age(4)       type c,
     docu             type icon_d,
     history          type icon_d,
     tlo_fullname     type text40,
     crstate_text(20) type c,
+    cr_duration(4)   type c,
     t_color          type lvc_t_scol,
   end of g_type_s_outtab.
 
@@ -46,6 +49,7 @@ data:
   gr_events      type ref to lcl_handle_events,
   g_okcode       type syucomm,
   gc_true        type sap_bool value 'X',
+  gc_max_uarage  type i value 365,
   gc_max_pwdage  type i value 365,
   gv_destination type char1024,
   lv_title       type string,
@@ -139,7 +143,9 @@ form select_data .
   data:
     ls_zgnpuserscrhist type zgnpuserscrhist,
     lv_date            type dats,
+    lv_uar_age         type i,
     lv_pwd_age         type i,
+    lv_cr_duration     type i,
     lt_color           type lvc_t_scol,
     ls_color           type lvc_s_scol,
     ls_usr03           type usr03.
@@ -175,6 +181,11 @@ form select_data .
       where crid eq p_crid.
   endif.
 
+  describe table gt_outtab lines lv_usrcount.
+  lv_title = lv_usrcount.
+  concatenate 'Generic and Privileged (GnP) Accounts (' lv_title 'accounts selected)' into lv_title.
+  sy-title = lv_title.
+
   loop at gt_outtab assigning <ls_outtab>.
     " Key columns
     clear lt_color.
@@ -197,10 +208,26 @@ form select_data .
     <ls_outtab>-t_color = lt_color.
     clear lt_color.
     clear ls_color.
+    " UAR age
+    if <ls_outtab>-uar is not initial.
+      lv_uar_age = sy-datum - <ls_outtab>-uar.
+      <ls_outtab>-uar_age = lv_uar_age.
+    else.
+      <ls_outtab>-uar_age = 999.
+    endif.
+    if <ls_outtab>-uar_age > gc_max_uarage.
+      <ls_outtab>-uar_status = icon_status_critical.
+    else.
+      <ls_outtab>-uar_status = icon_okay.
+    endif.
     " PWD age
-    lv_pwd_age = sy-datum - <ls_outtab>-pwdchange.
-    <ls_outtab>-pwd_age = lv_pwd_age.
-    if lv_pwd_age > gc_max_pwdage.
+    if <ls_outtab>-pwdchange is not initial.
+      lv_pwd_age = sy-datum - <ls_outtab>-pwdchange.
+      <ls_outtab>-pwd_age = lv_pwd_age.
+    else.
+      <ls_outtab>-pwd_age = 999.
+    endif.
+    if <ls_outtab>-pwd_age > gc_max_pwdage.
       <ls_outtab>-pwd_status = icon_status_critical.
     else.
       <ls_outtab>-pwd_status = icon_okay.
@@ -228,10 +255,14 @@ form select_data .
     if sy-subrc eq 0.
       <ls_outtab>-history = icon_history.
     endif.
-    " State
-    select single state_text from zgnpuserscrstat
-      into <ls_outtab>-crstate_text
-      where state eq <ls_outtab>-crstate.
+    " CR state text, CR duration
+    if <ls_outtab>-crid is not initial.
+      select single state_text from zgnpuserscrstat
+        into <ls_outtab>-crstate_text
+        where state eq <ls_outtab>-crstate.
+      lv_cr_duration = sy-datum - <ls_outtab>-crdate + 1.
+      <ls_outtab>-cr_duration = lv_cr_duration.
+    endif.
   endloop.
   sort gt_outtab by pwd_age descending.
 endform.
@@ -299,7 +330,17 @@ form display_fullscreen .
     catch cx_salv_not_found.
   endtry.
   try.
+      lr_column ?= lr_columns->get_column( 'UAR' ).
+      lr_column->set_technical( if_salv_c_bool_sap=>true ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
       lr_column ?= lr_columns->get_column( 'PWDCHANGE' ).
+      lr_column->set_technical( if_salv_c_bool_sap=>true ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'CRDATE' ).
       lr_column->set_technical( if_salv_c_bool_sap=>true ).
     catch cx_salv_not_found.
   endtry.
@@ -344,16 +385,18 @@ form display_fullscreen .
   gr_table->get_columns( )->set_column_position( columnname = 'EXTSID' position = 2 ).
   gr_table->get_columns( )->set_column_position( columnname = 'COMP' position = 3 ).
   gr_table->get_columns( )->set_column_position( columnname = 'ENV' position = 4 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'UAR' position = 5 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'DESCRIPTION' position = 5 ).
   gr_table->get_columns( )->set_column_position( columnname = 'HEC' position = 6 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'PWD_STATUS' position = 7 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'PWD_AGE' position = 8 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'DESCRIPTION' position = 9 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'DOCU' position = 10 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'HISTORY' position = 11 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'TLO_FULLNAME' position = 12 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'CRID' position = 13 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'CRSTATE_TEXT' position = 14 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'UAR_STATUS' position = 7 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'UAR_AGE' position = 8 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'PWD_STATUS' position = 9 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'PWD_AGE' position = 10 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'DOCU' position = 11 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'HISTORY' position = 12 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'TLO_FULLNAME' position = 13 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'CRID' position = 14 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'CRSTATE_TEXT' position = 15 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'CR_DURATION' position = 16 ).
   " Column color
   try.
       lr_columns->set_color_column( 't_color' ).
@@ -389,35 +432,6 @@ form display_fullscreen .
     catch cx_salv_not_found.
   endtry.
   try.
-      lr_column ?= lr_columns->get_column( 'UAR' ).
-      lr_column->set_short_text( 'UAR' ).
-      lr_column->set_medium_text( 'UAR date' ).
-      lr_column->set_long_text( 'UAR date' ).
-    catch cx_salv_not_found.
-  endtry.
-  try.
-      lr_column ?= lr_columns->get_column( 'HEC' ).
-      lr_column->set_short_text( 'HEC' ).
-      lr_column->set_medium_text( 'HEC managed' ).
-      lr_column->set_long_text( 'HEC managed' ).
-    catch cx_salv_not_found.
-  endtry.
-  try.
-      lr_column ?= lr_columns->get_column( 'PWD_STAT' ).
-      lr_column->set_icon( if_salv_c_bool_sap=>true ).
-      lr_column->set_short_text( 'PWD' ).
-      lr_column->set_medium_text( 'Password status' ).
-      lr_column->set_long_text( 'Password status' ).
-    catch cx_salv_not_found.
-  endtry.
-  try.
-      lr_column ?= lr_columns->get_column( 'PWD_AGE' ).
-      lr_column->set_short_text( 'Age' ).
-      lr_column->set_medium_text( 'Password age' ).
-      lr_column->set_long_text( 'Password age' ).
-    catch cx_salv_not_found.
-  endtry.
-  try.
       lr_column ?= lr_columns->get_column( 'DESCRIPTION' ).
       lr_column->set_short_text( 'Descript.' ).
       lr_column->set_medium_text( 'Description' ).
@@ -425,11 +439,52 @@ form display_fullscreen .
     catch cx_salv_not_found.
   endtry.
   try.
+      lr_column ?= lr_columns->get_column( 'HEC' ).
+      lr_column->set_short_text( 'HEC' ).
+      lr_column->set_medium_text( 'HEC managed' ).
+      lr_column->set_long_text( 'HEC managed' ).
+      lr_column->set_alignment( if_salv_c_alignment=>centered ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'UAR_STATUS' ).
+      lr_column->set_short_text( 'UAR' ).
+      lr_column->set_medium_text( 'UAR status' ).
+      lr_column->set_long_text( 'UAR status' ).
+      lr_column->set_alignment( if_salv_c_alignment=>centered ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'UAR_AGE' ).
+      lr_column->set_short_text( 'age' ).
+      lr_column->set_medium_text( 'UAR age' ).
+      lr_column->set_long_text( 'UAR age' ).
+      lr_column->set_alignment( if_salv_c_alignment=>right ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'PWD_STATUS' ).
+      lr_column->set_short_text( 'PWD' ).
+      lr_column->set_medium_text( 'Password status' ).
+      lr_column->set_long_text( 'Password status' ).
+      lr_column->set_alignment( if_salv_c_alignment=>centered ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'PWD_AGE' ).
+      lr_column->set_short_text( 'age' ).
+      lr_column->set_medium_text( 'Password age' ).
+      lr_column->set_long_text( 'Password age' ).
+    catch cx_salv_not_found.
+  endtry.
+
+  try.
       lr_column ?= lr_columns->get_column( 'DOCU' ).
       lr_column->set_cell_type( if_salv_c_cell_type=>hotspot ).
       lr_column->set_short_text( 'Docu' ).
       lr_column->set_medium_text( 'Accnt documentation' ).
       lr_column->set_long_text( 'Account documentation' ).
+      lr_column->set_alignment( if_salv_c_alignment=>centered ).
     catch cx_salv_not_found.
   endtry.
   try.
@@ -438,6 +493,7 @@ form display_fullscreen .
       lr_column->set_short_text( 'History' ).
       lr_column->set_medium_text( 'Change history' ).
       lr_column->set_long_text( 'Change history' ).
+      lr_column->set_alignment( if_salv_c_alignment=>centered ).
     catch cx_salv_not_found.
   endtry.
   try.
@@ -460,6 +516,14 @@ form display_fullscreen .
       lr_column->set_short_text( 'CR state' ).
       lr_column->set_medium_text( 'CR state' ).
       lr_column->set_long_text( 'CR state' ).
+    catch cx_salv_not_found.
+  endtry.
+  try.
+      lr_column ?= lr_columns->get_column( 'CR_DURATION' ).
+      lr_column->set_short_text( 'duration' ).
+      lr_column->set_medium_text( 'CR duration' ).
+      lr_column->set_long_text( 'CR duration' ).
+      lr_column->set_alignment( if_salv_c_alignment=>right ).
     catch cx_salv_not_found.
   endtry.
   gr_table->display( ).
@@ -623,9 +687,10 @@ form sn_post_change_request
     p_crid type zgnpusrcrid.
   types:
     begin of ty_result,
-      number type string,
-      state  type string,
-      sys_id type string,
+      number         type string,
+      state          type string,
+      sys_id         type string,
+      sys_created_on type string,
     end of ty_result.
 
   data:
@@ -695,6 +760,8 @@ form sn_post_change_request
     p_crid = ls_response-result-number.
     select single * from zgnpusers into ls_zgnpusers  where usruuid eq p_usruuid.
     ls_zgnpusers-crid = p_crid.
+    concatenate ls_response-result-sys_created_on(4) ls_response-result-sys_created_on+5(2) ls_response-result-sys_created_on+8(2)
+    into ls_zgnpusers-crdate.
     ls_zgnpusers-crstate = ls_response-result-state.
     ls_zgnpusers-crsysid = ls_response-result-sys_id.
     update zgnpusers from ls_zgnpusers.
@@ -710,15 +777,16 @@ form sn_post_change_request
   endif.
 endform.
 *&---------------------------------------------------------------------*
-*& Form SN_GET_CHANGE_REQUEST
+*& Form SN_GET_CHANGE_REQUESTS
 *&---------------------------------------------------------------------*
 *& text
 form sn_get_change_requests .
   types:
     begin of ty_result,
-      number type string,
-      state  type string,
-      sys_id type string,
+      number         type string,
+      state          type string,
+      sys_id         type string,
+      sys_created_on type string,
     end of ty_result.
 
   data:
@@ -781,7 +849,8 @@ form sn_get_change_requests .
       loop at lt_result into ls_result.
         if ls_result-number = ls_zgnpusers-crid.
           ls_zgnpusers-crstate = ls_result-state.
-*         ls_zgnpusers-reqsid = ls_result-sys_id.
+          concatenate ls_result-sys_created_on(4) ls_result-sys_created_on+5(2) ls_result-sys_created_on+8(2)
+          into ls_zgnpusers-crdate.
           update zgnpusers from ls_zgnpusers.
           exit.
         endif.
