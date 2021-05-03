@@ -86,7 +86,7 @@ form upload_file .
     skip.
   else.
     delete from zgnpusers.
-*   delete lt_users index 1.
+    delete lt_users index 1.
     loop at lt_users into ls_users.
       ls_users-mandt = sy-mandt.
       if ls_users-usruuid is initial.

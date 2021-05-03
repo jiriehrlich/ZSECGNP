@@ -520,9 +520,9 @@ form display_fullscreen .
   endtry.
   try.
       lr_column ?= lr_columns->get_column( 'CR_DURATION' ).
-      lr_column->set_short_text( 'duration' ).
-      lr_column->set_medium_text( 'CR duration' ).
-      lr_column->set_long_text( 'CR duration' ).
+      lr_column->set_short_text( 'age' ).
+      lr_column->set_medium_text( 'CR age' ).
+      lr_column->set_long_text( 'CR age' ).
       lr_column->set_alignment( if_salv_c_alignment=>right ).
     catch cx_salv_not_found.
   endtry.
