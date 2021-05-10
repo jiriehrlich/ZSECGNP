@@ -10,7 +10,8 @@ include <color>.
 include <icon>.
 
 tables:
-  zgnpuserscrstat.
+  zgnpuserscrstat,
+  sscrfields.
 
 types:
   begin of g_type_s_outtab.
@@ -124,10 +125,35 @@ initialization.
   sy-title = lv_title.
 
 *----------------------------------------------------------------------*
+* AT SELECTION-SCREEN
+*----------------------------------------------------------------------*
+at selection-screen.
+  case sscrfields-ucomm.
+    when 'COMPREP'.
+      call function 'TH_CREATE_MODE'
+        exporting
+          transaktion    = 'ZGNPCOMP'
+*         DEL_ON_EOT     = 0
+*         PARAMETERS     =
+*         PROCESS_DARK   = ''
+*         INHERIT_STAT_TRANS_ID       = 0
+*       IMPORTING
+*         MODE           =
+        exceptions
+          max_sessions   = 1
+          internal_error = 2
+          no_authority   = 3
+          others         = 4.
+      if sy-subrc ne 0.
+      endif.
+  endcase.
+
+*----------------------------------------------------------------------*
 * START-OF-SELECTION
 *----------------------------------------------------------------------*
 start-of-selection.
   perform select_data.
+
 *----------------------------------------------------------------------*
 * END-OF-SELECTION
 *----------------------------------------------------------------------*
@@ -139,7 +165,7 @@ end-of-selection.
 *&---------------------------------------------------------------------*
 form select_data .
   field-symbols:
-    <ls_outtab> type g_type_s_outtab.
+  <ls_outtab> type g_type_s_outtab.
   data:
     ls_zgnpuserscrhist type zgnpuserscrhist,
     lv_date            type dats,
@@ -153,17 +179,17 @@ form select_data .
   if p_crid is initial.
     if p_pwdall eq 'X'.
       select * from zgnpusers into corresponding fields of table gt_outtab
-        where crstate in s_state.
+      where crstate in s_state.
     elseif p_pwdncp eq 'X'.
       lv_date = sy-datum - gc_max_pwdage.
       select * from zgnpusers into corresponding fields of table gt_outtab
         where pwdchange lt lv_date and
-        crstate in s_state.
+      crstate in s_state.
     elseif p_pwdcp eq 'X'.
       lv_date = sy-datum - gc_max_pwdage.
       select * from zgnpusers into corresponding fields of table gt_outtab
         where pwdchange ge lv_date and
-        crstate in s_state.
+      crstate in s_state.
     endif.
     if p_uarall ne 'X'.
       lv_date = sy-datum - 1.
@@ -178,7 +204,7 @@ form select_data .
     endif.
   else.
     select * from zgnpusers into corresponding fields of table gt_outtab
-      where crid eq p_crid.
+    where crid eq p_crid.
   endif.
 
   describe table gt_outtab lines lv_usrcount.
@@ -259,7 +285,7 @@ form select_data .
     if <ls_outtab>-crid is not initial.
       select single state_text from zgnpuserscrstat
         into <ls_outtab>-crstate_text
-        where state eq <ls_outtab>-crstate.
+      where state eq <ls_outtab>-crstate.
       lv_cr_duration = sy-datum - <ls_outtab>-crdate + 1.
       <ls_outtab>-cr_duration = lv_cr_duration.
     endif.
@@ -272,7 +298,7 @@ endform.
 *&---------------------------------------------------------------------*
 form display_fullscreen .
   field-symbols:
-    <ls_outtab> type g_type_s_outtab.
+  <ls_outtab> type g_type_s_outtab.
   data:
 *   lr_functions  type ref to cl_salv_functions_list,
     lr_selections          type ref to cl_salv_selections,
@@ -899,7 +925,7 @@ endform.
 *&---------------------------------------------------------------------*
 form display_history using p_row.
   field-symbols:
-    <ls_outtab> type g_type_s_outtab2.
+  <ls_outtab> type g_type_s_outtab2.
   data:
     ls_outtab    type g_type_s_outtab,
     lr_columns   type ref to cl_salv_columns_table,
@@ -923,7 +949,7 @@ form display_history using p_row.
       " State
       select single state_text from zgnpuserscrstat
         into <ls_outtab>-crstate_text
-        where state eq <ls_outtab>-crstate.
+      where state eq <ls_outtab>-crstate.
     endloop.
     try.
         cl_salv_table=>factory(
