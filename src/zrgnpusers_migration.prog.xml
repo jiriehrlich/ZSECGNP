@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZRGNPUSERS_UPLOAD</NAME>
+    <NAME>ZRGNPUSERS_MIGRATION</NAME>
     <SUBC>1</SUBC>
     <RSTAT>K</RSTAT>
     <RLOAD>E</RLOAD>
@@ -13,7 +13,7 @@
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>Generic and Privileged (GnP) Accounts - Download/Upload</ENTRY>
+     <ENTRY>Generic and Privileged (GnP) Accounts - Migration</ENTRY>
      <LENGTH>55</LENGTH>
     </item>
     <item>

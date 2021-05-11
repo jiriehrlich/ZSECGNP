@@ -2805,14 +2805,8 @@
     <item>
      <ID>I</ID>
      <KEY>003</KEY>
-     <ENTRY>ServiceNow Change Request (CR)</ENTRY>
+     <ENTRY>Change Request (ServiceNow)</ENTRY>
      <LENGTH>30</LENGTH>
-    </item>
-    <item>
-     <ID>I</ID>
-     <KEY>004</KEY>
-     <ENTRY>User Access Review (UAR) status</ENTRY>
-     <LENGTH>31</LENGTH>
     </item>
     <item>
      <ID>R</ID>
@@ -2845,21 +2839,9 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_UARALL</KEY>
-     <ENTRY>All</ENTRY>
-     <LENGTH>11</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_UARCP</KEY>
-     <ENTRY>Compliant</ENTRY>
-     <LENGTH>17</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_UARNCP</KEY>
-     <ENTRY>Not compliant</ENTRY>
-     <LENGTH>21</LENGTH>
+     <KEY>P_SNUPD</KEY>
+     <ENTRY>Update from SN</ENTRY>
+     <LENGTH>29</LENGTH>
     </item>
     <item>
      <ID>S</ID>

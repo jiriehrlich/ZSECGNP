@@ -17,8 +17,8 @@ types:
   begin of g_type_s_outtab.
     include type zgnpusers.
   types:
-    uar_age(4)       type c,
-    uar_status       type icon_d,
+    ar_age(4)        type c,
+    ar_status        type icon_d,
     pwd_status       type icon_d,
     pwd_age(4)       type c,
     docu             type icon_d,
@@ -53,8 +53,9 @@ data:
   gc_max_uarage  type i value 365,
   gc_max_pwdage  type i value 365,
   gv_destination type char1024,
-  lv_title       type string,
-  lv_usrcount    type i.
+  gv_usrcount    type i,
+  gv_sn_tstmp    type tzntstmps.
+
 gv_destination = 'SERVICE_NOW'.
 
 *---------------------------------------------------------------------*
@@ -105,24 +106,17 @@ selection-screen end of block pwd.
 selection-screen begin of block cr with frame title text-003.
 select-options: s_state for zgnpuserscrstat-state matchcode object zgnpusers_crstat.
 parameters:
-  p_crid type zgnpusrcrid.
+  p_crid  type zgnpusrcrid.
+* p_snupd as checkbox default 'X'.
 selection-screen end of block cr.
-selection-screen begin of block uar with frame title text-004.
-parameters:
-  p_uarall radiobutton group uar default 'X',
-  p_uarcp  radiobutton group uar,
-  p_uarncp radiobutton group uar.
-selection-screen end of block uar.
 
 *----------------------------------------------------------------------*
 * INITIALIZATION
 *----------------------------------------------------------------------*
 initialization.
   set pf-status 'SEL_SCREEN'.
-  select count( * ) into lv_usrcount from zgnpusers.
-  lv_title = lv_usrcount.
-  concatenate 'Generic and Privileged (GnP) Accounts (' lv_title 'accounts)' into lv_title.
-  sy-title = lv_title.
+  select count( * ) into gv_usrcount from zgnpusers.
+  perform update_title.
 
 *----------------------------------------------------------------------*
 * AT SELECTION-SCREEN
@@ -169,48 +163,40 @@ form select_data .
   data:
     ls_zgnpuserscrhist type zgnpuserscrhist,
     lv_date            type dats,
-    lv_uar_age         type i,
+    lv_ar_age          type i,
     lv_pwd_age         type i,
     lv_cr_duration     type i,
     lt_color           type lvc_t_scol,
     ls_color           type lvc_s_scol,
     ls_usr03           type usr03.
 
-  if p_crid is initial.
-    if p_pwdall eq 'X'.
-      select * from zgnpusers into corresponding fields of table gt_outtab
-      where crstate in s_state.
-    elseif p_pwdncp eq 'X'.
-      lv_date = sy-datum - gc_max_pwdage.
-      select * from zgnpusers into corresponding fields of table gt_outtab
-        where pwdchange lt lv_date and
-      crstate in s_state.
-    elseif p_pwdcp eq 'X'.
-      lv_date = sy-datum - gc_max_pwdage.
-      select * from zgnpusers into corresponding fields of table gt_outtab
-        where pwdchange ge lv_date and
-      crstate in s_state.
-    endif.
-    if p_uarall ne 'X'.
-      lv_date = sy-datum - 1.
-      if p_uarcp eq 'X'.
-        " delete gt_outtab where ( uar is initial ) or ( uar lt lv_date ).
-        delete gt_outtab where ( uar is initial ).
-      endif.
-      if p_uarncp eq 'X'.
-        " delete gt_outtab where uar is not initial and uar gt lv_date.
-        delete gt_outtab where ( uar is not initial ).
-      endif.
-    endif.
-  else.
+  if p_usrid is not initial.
     select * from zgnpusers into corresponding fields of table gt_outtab
-    where crid eq p_crid.
+      where usrid eq p_usrid.
+  else.
+    if p_crid is initial.
+      if p_pwdall eq 'X'.
+        select * from zgnpusers into corresponding fields of table gt_outtab
+        where crstate in s_state.
+      elseif p_pwdncp eq 'X'.
+        lv_date = sy-datum - gc_max_pwdage.
+        select * from zgnpusers into corresponding fields of table gt_outtab
+          where pwdchange lt lv_date and
+        crstate in s_state.
+      elseif p_pwdcp eq 'X'.
+        lv_date = sy-datum - gc_max_pwdage.
+        select * from zgnpusers into corresponding fields of table gt_outtab
+          where pwdchange ge lv_date and
+        crstate in s_state.
+      endif.
+    else.
+      select * from zgnpusers into corresponding fields of table gt_outtab
+      where crid eq p_crid.
+    endif.
   endif.
 
-  describe table gt_outtab lines lv_usrcount.
-  lv_title = lv_usrcount.
-  concatenate 'Generic and Privileged (GnP) Accounts (' lv_title 'accounts selected)' into lv_title.
-  sy-title = lv_title.
+  describe table gt_outtab lines gv_usrcount.
+  perform update_title.
 
   loop at gt_outtab assigning <ls_outtab>.
     " Key columns
@@ -235,16 +221,16 @@ form select_data .
     clear lt_color.
     clear ls_color.
     " UAR age
-    if <ls_outtab>-uar is not initial.
-      lv_uar_age = sy-datum - <ls_outtab>-uar.
-      <ls_outtab>-uar_age = lv_uar_age.
+    if <ls_outtab>-ardate is not initial.
+      lv_ar_age = sy-datum - <ls_outtab>-ardate.
+      <ls_outtab>-ar_age = lv_ar_age.
     else.
-      <ls_outtab>-uar_age = 999.
+      <ls_outtab>-ar_age = 999.
     endif.
-    if <ls_outtab>-uar_age > gc_max_uarage.
-      <ls_outtab>-uar_status = icon_status_critical.
+    if <ls_outtab>-ar_age > gc_max_uarage.
+      <ls_outtab>-ar_status = icon_status_critical.
     else.
-      <ls_outtab>-uar_status = icon_okay.
+      <ls_outtab>-ar_status = icon_okay.
     endif.
     " PWD age
     if <ls_outtab>-pwdchange is not initial.
@@ -294,7 +280,7 @@ form select_data .
 endform.
 
 *&---------------------------------------------------------------------*
-*&      Form  display_fullscreen
+*& Form  display_fullscreen
 *&---------------------------------------------------------------------*
 form display_fullscreen .
   field-symbols:
@@ -356,7 +342,7 @@ form display_fullscreen .
     catch cx_salv_not_found.
   endtry.
   try.
-      lr_column ?= lr_columns->get_column( 'UAR' ).
+      lr_column ?= lr_columns->get_column( 'ARDATE' ).
       lr_column->set_technical( if_salv_c_bool_sap=>true ).
     catch cx_salv_not_found.
   endtry.
@@ -413,8 +399,8 @@ form display_fullscreen .
   gr_table->get_columns( )->set_column_position( columnname = 'ENV' position = 4 ).
   gr_table->get_columns( )->set_column_position( columnname = 'DESCRIPTION' position = 5 ).
   gr_table->get_columns( )->set_column_position( columnname = 'HEC' position = 6 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'UAR_STATUS' position = 7 ).
-  gr_table->get_columns( )->set_column_position( columnname = 'UAR_AGE' position = 8 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'AR_STATUS' position = 7 ).
+  gr_table->get_columns( )->set_column_position( columnname = 'AR_AGE' position = 8 ).
   gr_table->get_columns( )->set_column_position( columnname = 'PWD_STATUS' position = 9 ).
   gr_table->get_columns( )->set_column_position( columnname = 'PWD_AGE' position = 10 ).
   gr_table->get_columns( )->set_column_position( columnname = 'DOCU' position = 11 ).
@@ -473,18 +459,18 @@ form display_fullscreen .
     catch cx_salv_not_found.
   endtry.
   try.
-      lr_column ?= lr_columns->get_column( 'UAR_STATUS' ).
-      lr_column->set_short_text( 'UAR' ).
-      lr_column->set_medium_text( 'UAR status' ).
-      lr_column->set_long_text( 'UAR status' ).
+      lr_column ?= lr_columns->get_column( 'AR_STATUS' ).
+      lr_column->set_short_text( 'AR' ).
+      lr_column->set_medium_text( 'AR status' ).
+      lr_column->set_long_text( 'AR status' ).
       lr_column->set_alignment( if_salv_c_alignment=>centered ).
     catch cx_salv_not_found.
   endtry.
   try.
-      lr_column ?= lr_columns->get_column( 'UAR_AGE' ).
+      lr_column ?= lr_columns->get_column( 'AR_AGE' ).
       lr_column->set_short_text( 'age' ).
-      lr_column->set_medium_text( 'UAR age' ).
-      lr_column->set_long_text( 'UAR age' ).
+      lr_column->set_medium_text( 'AR age' ).
+      lr_column->set_long_text( 'AR age' ).
       lr_column->set_alignment( if_salv_c_alignment=>right ).
     catch cx_salv_not_found.
   endtry.
@@ -556,7 +542,7 @@ form display_fullscreen .
 endform.
 
 *&---------------------------------------------------------------------*
-*&      Form  handle_user_command
+*& Form  handle_user_command
 *&---------------------------------------------------------------------*
 form handle_user_command using i_ucomm type salv_de_function.
   case i_ucomm.
@@ -568,6 +554,7 @@ form handle_user_command using i_ucomm type salv_de_function.
       perform sn_get_change_requests.
       perform select_data.
       gr_table->refresh( refresh_mode = if_salv_c_refresh=>soft ).
+      perform update_title.
     when 'INFO'.
       perform display_program_docu.
     when others.
@@ -575,9 +562,9 @@ form handle_user_command using i_ucomm type salv_de_function.
 endform.
 
 *&---------------------------------------------------------------------*
-*&      Form  get_selections
+*& Form  get_selections
 *&---------------------------------------------------------------------*
-form get_selections .
+form get_selections.
   data:
     lr_selections type ref to cl_salv_selections,
     lt_rows       type salv_t_row,
@@ -605,6 +592,7 @@ form get_selections .
     endif.
   endloop.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_PROGRAM_DOCU
 *&---------------------------------------------------------------------*
@@ -650,6 +638,7 @@ form display_program_docu .
     endif.
   endif.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_ACCOUNT_DOCU
 *&---------------------------------------------------------------------*
@@ -701,6 +690,7 @@ form display_account_docu using p_row.
     endif.
   endif.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form SN_POST_CHANGE_REQUEST
 *&---------------------------------------------------------------------*
@@ -802,11 +792,12 @@ form sn_post_change_request
 *   write:/ ls_response-result-number, ls_response-result-state.
   endif.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form SN_GET_CHANGE_REQUESTS
 *&---------------------------------------------------------------------*
 *& text
-form sn_get_change_requests .
+form sn_get_change_requests.
   types:
     begin of ty_result,
       number         type string,
@@ -863,6 +854,7 @@ form sn_get_change_requests .
   lo_rest_client->get( ).
   lv_return_code = lo_rest_client->get_status( ).
   if lv_return_code eq 200.
+    get time stamp field gv_sn_tstmp.
     cl_progress_indicator=>progress_indicate( i_text = |Processing ServiceNow data ...| i_output_immediately = abap_true ).
     lo_rest_entity = lo_rest_client->get_response_entity( ).
     lv_json_data = lo_rest_entity->get_string_data( ).
@@ -887,6 +879,7 @@ form sn_get_change_requests .
     message i000(0k) with lv_message.
   endif.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_CR
 *&---------------------------------------------------------------------*
@@ -920,6 +913,7 @@ form display_cr using p_row.
     endif.
   endif.
 endform.
+
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_HISTORY
 *&---------------------------------------------------------------------*
@@ -1015,4 +1009,28 @@ form display_history using p_row.
     " Display table
     gr_table2->display( ).
   endif.
+endform.
+
+*&---------------------------------------------------------------------*
+*& Form UPDATE_TITLE
+*&---------------------------------------------------------------------*
+form update_title.
+  data:
+    lv_title    type string,
+    lv_sn_tstmp type string.
+
+  if gv_sn_tstmp is initial.
+    lv_title = gv_usrcount.
+    concatenate 'GnP Accounts (' lv_title ')' into lv_title separated by space.
+  else.
+    call function 'RRBA_CONVERT_TIMESTAMP_TO_STR'
+      exporting
+        i_timestamp = gv_sn_tstmp
+      importing
+        e_output    = lv_sn_tstmp.
+    lv_title = gv_usrcount.
+    concatenate 'GnP Accounts (' lv_title ', last update ' lv_sn_tstmp ')' into lv_title separated by space.
+  endif.
+  condense lv_title.
+  sy-title = lv_title.
 endform.

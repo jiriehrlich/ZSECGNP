@@ -14,49 +14,61 @@
     <item>
      <ID>I</ID>
      <KEY>001</KEY>
-     <ENTRY>Compliance Report</ENTRY>
+     <ENTRY>Compliance report</ENTRY>
      <LENGTH>27</LENGTH>
     </item>
     <item>
      <ID>I</ID>
      <KEY>002</KEY>
-     <ENTRY>Download</ENTRY>
+     <ENTRY>Excel</ENTRY>
      <LENGTH>18</LENGTH>
     </item>
     <item>
      <ID>R</ID>
-     <ENTRY>Generic and Privileged (GnP) Accounts - Compliance Reports</ENTRY>
-     <LENGTH>58</LENGTH>
+     <ENTRY>GnP Accounts - Compliance Reports</ENTRY>
+     <LENGTH>33</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_DATA</KEY>
-     <ENTRY>Report data</ENTRY>
-     <LENGTH>19</LENGTH>
+     <ENTRY>Download data</ENTRY>
+     <LENGTH>21</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_DOC</KEY>
-     <ENTRY>Proc. documentation compliance</ENTRY>
+     <ENTRY>Process documentation</ENTRY>
      <LENGTH>38</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_FORM</KEY>
-     <ENTRY>Report template (Excel)</ENTRY>
+     <ENTRY>Download template</ENTRY>
      <LENGTH>31</LENGTH>
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_OPEN</KEY>
+     <ENTRY>Open template</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_PWD</KEY>
-     <ENTRY>Password compliance</ENTRY>
+     <ENTRY>Passwords</ENTRY>
      <LENGTH>27</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_UAR</KEY>
-     <ENTRY>UAR compliance</ENTRY>
-     <LENGTH>22</LENGTH>
+     <ENTRY>Access Review</ENTRY>
+     <LENGTH>32</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_WDIR</KEY>
+     <ENTRY>Working directory</ENTRY>
+     <LENGTH>25</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

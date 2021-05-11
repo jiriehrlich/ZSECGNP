@@ -19,7 +19,9 @@ selection-screen end of block rep_type.
 selection-screen begin of block download with frame title text-002.
 parameters:
   p_data radiobutton group dwnl default 'X',
-  p_form radiobutton group dwnl.
+  p_form radiobutton group dwnl,
+  p_open radiobutton group dwnl,
+  p_wdir type string default 'C:\Temp'.
 selection-screen end of block download.
 *----------------------------------------------------------------------*
 * INITIALIZATION
