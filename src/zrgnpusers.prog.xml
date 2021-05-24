@@ -490,6 +490,16 @@
       <PATH>A</PATH>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
+      <CODE>COMPL</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_REPORT</TEXT_NAME>
+      <ICON_ID>@AL@</ICON_ID>
+      <FUN_TEXT>Compliance Reports</FUN_TEXT>
+      <ICON_TEXT>Compliance Reports</ICON_TEXT>
+      <INFO_TEXT>Compliance Reports</INFO_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
       <CODE>COMPREP</CODE>
       <TEXTNO>001</TEXTNO>
       <TEXT_TYPE>S</TEXT_TYPE>
@@ -498,6 +508,26 @@
       <FUN_TEXT>Compliance Report</FUN_TEXT>
       <ICON_TEXT>Compliance Reports</ICON_TEXT>
       <INFO_TEXT>Compliance Reports</INFO_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>COMPREPS</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_REPORT</TEXT_NAME>
+      <ICON_ID>@AL@</ICON_ID>
+      <FUN_TEXT>Compliance Reports</FUN_TEXT>
+      <ICON_TEXT>Compliance Reports</ICON_TEXT>
+      <INFO_TEXT>Compliance Reports</INFO_TEXT>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>CONF</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_SETTINGS</TEXT_NAME>
+      <ICON_ID>@XC@</ICON_ID>
+      <FUN_TEXT>Settings</FUN_TEXT>
+      <ICON_TEXT>Settings</ICON_TEXT>
+      <INFO_TEXT>Settings</INFO_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>CONFIG</CODE>
@@ -738,6 +768,16 @@
       <ICON_ID>@0S@</ICON_ID>
       <FUN_TEXT>Selection Screen Help</FUN_TEXT>
       <PATH>H</PATH>
+     </RSMPE_FUNT>
+     <RSMPE_FUNT>
+      <CODE>SETTINGS</CODE>
+      <TEXTNO>001</TEXTNO>
+      <TEXT_TYPE>S</TEXT_TYPE>
+      <TEXT_NAME>ICON_SETTINGS</TEXT_NAME>
+      <ICON_ID>@XC@</ICON_ID>
+      <FUN_TEXT>Settings</FUN_TEXT>
+      <ICON_TEXT>Settings</ICON_TEXT>
+      <INFO_TEXT>Settings</INFO_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>SET_CELL</CODE>
@@ -1573,7 +1613,7 @@
       <PFK_CODE>000003</PFK_CODE>
       <CODE>0001</CODE>
       <NO>02</NO>
-      <PFNO>07</PFNO>
+      <PFNO>32</PFNO>
      </RSMPE_BUT>
      <RSMPE_BUT>
       <PFK_CODE>000003</PFK_CODE>
@@ -1585,7 +1625,7 @@
       <PFK_CODE>000003</PFK_CODE>
       <CODE>0001</CODE>
       <NO>04</NO>
-      <PFNO>06</PFNO>
+      <PFNO>33</PFNO>
      </RSMPE_BUT>
      <RSMPE_BUT>
       <PFK_CODE>000003</PFK_CODE>
@@ -2047,6 +2087,12 @@
      </RSMPE_PFK>
      <RSMPE_PFK>
       <CODE>000003</CODE>
+      <PFNO>21</PFNO>
+      <FUNCODE>SETTINGS</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000003</CODE>
       <PFNO>25</PFNO>
       <FUNCODE>FC01</FUNCODE>
       <FUNNO>001</FUNNO>
@@ -2079,6 +2125,24 @@
       <CODE>000003</CODE>
       <PFNO>30</PFNO>
       <FUNCODE>LVUV</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000003</CODE>
+      <PFNO>31</PFNO>
+      <FUNCODE>COMPREPS</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000003</CODE>
+      <PFNO>32</PFNO>
+      <FUNCODE>CONF</FUNCODE>
+      <FUNNO>001</FUNNO>
+     </RSMPE_PFK>
+     <RSMPE_PFK>
+      <CODE>000003</CODE>
+      <PFNO>33</PFNO>
+      <FUNCODE>COMPL</FUNCODE>
       <FUNNO>001</FUNNO>
      </RSMPE_PFK>
      <RSMPE_PFK>
@@ -2603,7 +2667,19 @@
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>SEL_SCREEN</STATUS>
+      <FUNCTION>COMPL</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>SEL_SCREEN</STATUS>
       <FUNCTION>COMPREP</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>SEL_SCREEN</STATUS>
+      <FUNCTION>COMPREPS</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>SEL_SCREEN</STATUS>
+      <FUNCTION>CONF</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>SEL_SCREEN</STATUS>
@@ -2696,6 +2772,10 @@
      <RSMPE_STAF>
       <STATUS>SEL_SCREEN</STATUS>
       <FUNCTION>SCRH</FUNCTION>
+     </RSMPE_STAF>
+     <RSMPE_STAF>
+      <STATUS>SEL_SCREEN</STATUS>
+      <FUNCTION>SETTINGS</FUNCTION>
      </RSMPE_STAF>
      <RSMPE_STAF>
       <STATUS>SEL_SCREEN</STATUS>
@@ -2810,7 +2890,7 @@
     </item>
     <item>
      <ID>R</ID>
-     <ENTRY>Generic and Privileged (GnP) Accounts</ENTRY>
+     <ENTRY>GnP Accounts</ENTRY>
      <LENGTH>37</LENGTH>
     </item>
     <item>

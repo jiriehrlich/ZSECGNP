@@ -123,10 +123,27 @@ initialization.
 *----------------------------------------------------------------------*
 at selection-screen.
   case sscrfields-ucomm.
-    when 'COMPREP'.
+    when 'COMPL'.
       call function 'TH_CREATE_MODE'
         exporting
-          transaktion    = 'ZGNPCOMP'
+          transaktion    = 'ZGNPCOMPL'
+*         DEL_ON_EOT     = 0
+*         PARAMETERS     =
+*         PROCESS_DARK   = ''
+*         INHERIT_STAT_TRANS_ID       = 0
+*       IMPORTING
+*         MODE           =
+        exceptions
+          max_sessions   = 1
+          internal_error = 2
+          no_authority   = 3
+          others         = 4.
+      if sy-subrc ne 0.
+      endif.
+    when 'CONF'.
+      call function 'TH_CREATE_MODE'
+        exporting
+          transaktion    = 'ZGNPCONF'
 *         DEL_ON_EOT     = 0
 *         PARAMETERS     =
 *         PROCESS_DARK   = ''

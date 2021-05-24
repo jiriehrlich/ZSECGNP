@@ -1,28 +1,23 @@
 *&---------------------------------------------------------------------*
-*& Report ZRGNPUSERS_COMPLIANCE
+*& Report ZRGNPUSERS_CONF
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-report zrgnpusers_compreports.
+report zrgnpusers_conf.
 data:
   lv_fm_name  type tdsfname,
   gt_gnpusers type standard table of zgnpusers.
 *----------------------------------------------------------------------*
 * SELECTION-SCREEN
 *----------------------------------------------------------------------*
-selection-screen begin of block rep_type with frame title text-001.
+selection-screen begin of block global with frame title text-001.
 parameters:
-  p_uar radiobutton group rtyp,
-  p_pwd radiobutton group rtyp default 'X',
-  p_doc radiobutton group rtyp.
-selection-screen end of block rep_type.
-selection-screen begin of block download with frame title text-002.
-parameters:
-  p_data radiobutton group dwnl default 'X',
-  p_form radiobutton group dwnl,
-  p_open radiobutton group dwnl,
-  p_wdir type string default 'C:\Temp'.
-selection-screen end of block download.
+  p_dest  type rfcdest,
+  p_arage type numc3,
+  p_arthd type numc2,
+  p_pwage type numc3,
+  p_pwthd type numc2.
+selection-screen end of block global.
 *----------------------------------------------------------------------*
 * INITIALIZATION
 *----------------------------------------------------------------------*
