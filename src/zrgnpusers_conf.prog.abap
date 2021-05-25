@@ -4,81 +4,72 @@
 *&
 *&---------------------------------------------------------------------*
 report zrgnpusers_conf.
+data: begin of gs_global_conf,
+        destination   type rfcdest,
+        ar_age        type numc3,
+        ar_threshold  type numc2,
+        pwd_age       type numc3,
+        pwd_threshold type numc2,
+      end of gs_global_conf.
 data:
-  lv_fm_name  type tdsfname,
-  gt_gnpusers type standard table of zgnpusers.
+  gs_conf_table type zgnpusersconf,
+  gv_xml_string type string.
 *----------------------------------------------------------------------*
 * SELECTION-SCREEN
 *----------------------------------------------------------------------*
 selection-screen begin of block global with frame title text-001.
 parameters:
-  p_dest  type rfcdest,
-  p_arage type numc3,
-  p_arthd type numc2,
-  p_pwage type numc3,
-  p_pwthd type numc2.
+  p_dest  type rfcdest default '1',
+  p_arage type numc3 default '2',
+  p_arthd type numc2 default '3',
+  p_pwage type numc3 default '4',
+  p_pwthd type numc2 default '5'.
 selection-screen end of block global.
 *----------------------------------------------------------------------*
 * INITIALIZATION
 *----------------------------------------------------------------------*
 initialization.
+  perform read_configuration.
 *----------------------------------------------------------------------*
 * START-OF-SELECTION
 *----------------------------------------------------------------------*
 start-of-selection.
-  perform select_data.
 *----------------------------------------------------------------------*
 * END-OF-SELECTION
 *----------------------------------------------------------------------*
 end-of-selection.
-  perform generate_report.
+  perform save_configuration.
 *&---------------------------------------------------------------------*
-*& Form SELECT_DATA
+*& Form READ_CONFIGURATION
 *&---------------------------------------------------------------------*
-form select_data.
-  select * from zgnpusers into corresponding fields of table gt_gnpusers.
+form read_configuration.
+  " Global
+  select single * from zgnpusersconf into corresponding fields of gs_conf_table
+    where type eq 'GLOBAL'.
+  if sy-subrc eq 0.
+    gv_xml_string = gs_conf_table-data_str.
+    call transformation id source xml gv_xml_string
+    result struct = gs_global_conf.
+    p_dest  = gs_global_conf-destination.
+    p_arage = gs_global_conf-ar_age.
+    p_arthd = gs_global_conf-ar_threshold.
+    p_pwage = gs_global_conf-pwd_age.
+    p_pwthd = gs_global_conf-pwd_threshold.
+  endif.
 endform.
 *&---------------------------------------------------------------------*
-*& Form GENERATE_REPORT
+*& Form SAVE_CONFIGURATION
 *&---------------------------------------------------------------------*
-form generate_report .
-  call function 'SSF_FUNCTION_MODULE_NAME'
-    exporting
-      formname           = 'ZGNP_COMPREPORT_PWD'
-*     VARIANT            = ' '
-*     DIRECT_CALL        = ' '
-    importing
-      fm_name            = lv_fm_name
-    exceptions
-      no_form            = 1
-      no_function_module = 2
-      others             = 3.
-  if sy-subrc <> 0.
-  endif.
-
-  call function lv_fm_name
-* EXPORTING
-*   ARCHIVE_INDEX              =
-*   ARCHIVE_INDEX_TAB          =
-*   ARCHIVE_PARAMETERS         =
-*   CONTROL_PARAMETERS         =
-*   MAIL_APPL_OBJ              =
-*   MAIL_RECIPIENT             =
-*   MAIL_SENDER                =
-*   OUTPUT_OPTIONS             =
-*   USER_SETTINGS              = 'X'
-* IMPORTING
-*   DOCUMENT_OUTPUT_INFO       =
-*   JOB_OUTPUT_INFO            =
-*   JOB_OUTPUT_OPTIONS         =
-    tables
-      gnpusers         = gt_gnpusers
-    exceptions
-      formatting_error = 1
-      internal_error   = 2
-      send_error       = 3
-      user_canceled    = 4
-      others           = 5.
-  if sy-subrc <> 0.
-  endif.
+form save_configuration.
+  " Global
+  gs_global_conf-destination = p_dest.
+  gs_global_conf-ar_age = p_arage.
+  gs_global_conf-ar_threshold = p_arthd.
+  gs_global_conf-pwd_age = p_pwage.
+  gs_global_conf-pwd_threshold = p_pwthd.
+  call transformation id source struct = gs_global_conf
+                       result xml gv_xml_string.
+  gs_conf_table-type = 'GLOBAL'.
+  gs_conf_table-data_str = gv_xml_string.
+  modify zgnpusersconf from gs_conf_table.
 endform.

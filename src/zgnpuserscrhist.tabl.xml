@@ -7,7 +7,7 @@
     <DDLANGUAGE>E</DDLANGUAGE>
     <TABCLASS>TRANSP</TABCLASS>
     <CLIDEP>X</CLIDEP>
-    <DDTEXT>Generic and Privileged (GnP) Accounts - CRs</DDTEXT>
+    <DDTEXT>GnP Accounts - CRs</DDTEXT>
     <MAINFLAG>X</MAINFLAG>
     <CONTFLAG>A</CONTFLAG>
     <EXCLASS>1</EXCLASS>
