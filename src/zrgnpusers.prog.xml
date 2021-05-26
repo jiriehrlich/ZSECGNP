@@ -525,9 +525,9 @@
       <TEXT_TYPE>S</TEXT_TYPE>
       <TEXT_NAME>ICON_SETTINGS</TEXT_NAME>
       <ICON_ID>@XC@</ICON_ID>
-      <FUN_TEXT>Settings</FUN_TEXT>
-      <ICON_TEXT>Settings</ICON_TEXT>
-      <INFO_TEXT>Settings</INFO_TEXT>
+      <FUN_TEXT>Configuration</FUN_TEXT>
+      <ICON_TEXT>Configuration</ICON_TEXT>
+      <INFO_TEXT>Configuration</INFO_TEXT>
      </RSMPE_FUNT>
      <RSMPE_FUNT>
       <CODE>CONFIG</CODE>

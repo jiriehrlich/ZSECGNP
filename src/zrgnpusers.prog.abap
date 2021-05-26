@@ -50,14 +50,13 @@ data:
   gr_events      type ref to lcl_handle_events,
   g_okcode       type syucomm,
   gc_true        type sap_bool value 'X',
-  gc_max_uarage  type i value 365,
-  gc_max_pwdage  type i value 365,
   gv_destination type char1024,
+  gv_ar_maxage   type i,
+  gv_ar_wngage   type i,
+  gv_pwd_maxage  type i,
+  gv_pwd_wngage  type i,
   gv_usrcount    type i,
   gv_sn_tstmp    type tzntstmps.
-
-gv_destination = 'SERVICE_NOW'.
-
 *---------------------------------------------------------------------*
 *       CLASS lcl_handle_events DEFINITION
 *---------------------------------------------------------------------*
@@ -69,7 +68,6 @@ class lcl_handle_events definition.
       on_link_click for event link_click of cl_salv_events_table
         importing row column.
 endclass.
-
 *---------------------------------------------------------------------*
 *       CLASS lcl_handle_events IMPLEMENTATION
 *---------------------------------------------------------------------*
@@ -89,7 +87,6 @@ class lcl_handle_events implementation.
   endmethod.
 
 endclass.
-
 *----------------------------------------------------------------------*
 * SELECTION-SCREEN
 *----------------------------------------------------------------------*
@@ -109,7 +106,6 @@ parameters:
   p_crid  type zgnpusrcrid.
 * p_snupd as checkbox default 'X'.
 selection-screen end of block cr.
-
 *----------------------------------------------------------------------*
 * INITIALIZATION
 *----------------------------------------------------------------------*
@@ -117,7 +113,7 @@ initialization.
   set pf-status 'SEL_SCREEN'.
   select count( * ) into gv_usrcount from zgnpusers.
   perform update_title.
-
+  perform read_configuration.
 *----------------------------------------------------------------------*
 * AT SELECTION-SCREEN
 *----------------------------------------------------------------------*
@@ -158,19 +154,16 @@ at selection-screen.
       if sy-subrc ne 0.
       endif.
   endcase.
-
 *----------------------------------------------------------------------*
 * START-OF-SELECTION
 *----------------------------------------------------------------------*
 start-of-selection.
   perform select_data.
-
 *----------------------------------------------------------------------*
 * END-OF-SELECTION
 *----------------------------------------------------------------------*
 end-of-selection.
   perform display_fullscreen.
-
 *&---------------------------------------------------------------------*
 *& Form SELECT_DATA
 *&---------------------------------------------------------------------*
@@ -196,12 +189,12 @@ form select_data .
         select * from zgnpusers into corresponding fields of table gt_outtab
         where crstate in s_state.
       elseif p_pwdncp eq 'X'.
-        lv_date = sy-datum - gc_max_pwdage.
+        lv_date = sy-datum - gv_pwd_maxage.
         select * from zgnpusers into corresponding fields of table gt_outtab
           where pwdchange lt lv_date and
         crstate in s_state.
       elseif p_pwdcp eq 'X'.
-        lv_date = sy-datum - gc_max_pwdage.
+        lv_date = sy-datum - gv_pwd_maxage.
         select * from zgnpusers into corresponding fields of table gt_outtab
           where pwdchange ge lv_date and
         crstate in s_state.
@@ -244,8 +237,10 @@ form select_data .
     else.
       <ls_outtab>-ar_age = 999.
     endif.
-    if <ls_outtab>-ar_age > gc_max_uarage.
+    if <ls_outtab>-ar_age > gv_ar_maxage.
       <ls_outtab>-ar_status = icon_status_critical.
+    elseif <ls_outtab>-ar_age + 1 > gv_ar_wngage.
+      <ls_outtab>-ar_status = icon_warning.
     else.
       <ls_outtab>-ar_status = icon_okay.
     endif.
@@ -256,8 +251,10 @@ form select_data .
     else.
       <ls_outtab>-pwd_age = 999.
     endif.
-    if <ls_outtab>-pwd_age > gc_max_pwdage.
+    if <ls_outtab>-pwd_age > gv_pwd_maxage.
       <ls_outtab>-pwd_status = icon_status_critical.
+    elseif <ls_outtab>-pwd_age + 1 > gv_pwd_wngage.
+      <ls_outtab>-pwd_status = icon_warning.
     else.
       <ls_outtab>-pwd_status = icon_okay.
     endif.
@@ -295,7 +292,6 @@ form select_data .
   endloop.
   sort gt_outtab by pwd_age descending.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form  display_fullscreen
 *&---------------------------------------------------------------------*
@@ -557,7 +553,6 @@ form display_fullscreen .
   endtry.
   gr_table->display( ).
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form  handle_user_command
 *&---------------------------------------------------------------------*
@@ -577,7 +572,6 @@ form handle_user_command using i_ucomm type salv_de_function.
     when others.
   endcase.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form  get_selections
 *&---------------------------------------------------------------------*
@@ -609,7 +603,6 @@ form get_selections.
     endif.
   endloop.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_PROGRAM_DOCU
 *&---------------------------------------------------------------------*
@@ -655,7 +648,6 @@ form display_program_docu .
     endif.
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_ACCOUNT_DOCU
 *&---------------------------------------------------------------------*
@@ -707,7 +699,6 @@ form display_account_docu using p_row.
     endif.
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form SN_POST_CHANGE_REQUEST
 *&---------------------------------------------------------------------*
@@ -809,7 +800,6 @@ form sn_post_change_request
 *   write:/ ls_response-result-number, ls_response-result-state.
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form SN_GET_CHANGE_REQUESTS
 *&---------------------------------------------------------------------*
@@ -896,7 +886,6 @@ form sn_get_change_requests.
     message i000(0k) with lv_message.
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_CR
 *&---------------------------------------------------------------------*
@@ -930,7 +919,6 @@ form display_cr using p_row.
     endif.
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form DISPLAY_HISTORY
 *&---------------------------------------------------------------------*
@@ -1027,7 +1015,6 @@ form display_history using p_row.
     gr_table2->display( ).
   endif.
 endform.
-
 *&---------------------------------------------------------------------*
 *& Form UPDATE_TITLE
 *&---------------------------------------------------------------------*
@@ -1050,4 +1037,35 @@ form update_title.
   endif.
   condense lv_title.
   sy-title = lv_title.
+endform.
+*&---------------------------------------------------------------------*
+*& Form READ_CONFIGURATION
+*&---------------------------------------------------------------------*
+form read_configuration.
+  data:
+    begin of ls_conf_global,
+      destination type rfcdest,
+      ar_maxage   type numc3,
+      ar_wngage   type numc3,
+      pwd_maxage  type numc3,
+      pwd_wngage  type numc3,
+    end of ls_conf_global.
+
+  data:
+    ls_conf_db    type zgnpusersconf,
+    lv_xml_string type string.
+
+  " Global configuration
+  select single * from zgnpusersconf into corresponding fields of ls_conf_db
+    where type eq 'GLOBAL'.
+  if sy-subrc eq 0.
+    lv_xml_string = ls_conf_db-data_str.
+    call transformation id source xml lv_xml_string
+    result struct = ls_conf_global.
+    gv_destination = ls_conf_global-destination.
+    gv_ar_maxage = ls_conf_global-ar_maxage.
+    gv_ar_wngage = ls_conf_global-ar_wngage.
+    gv_pwd_maxage = ls_conf_global-pwd_maxage.
+    gv_pwd_wngage = ls_conf_global-pwd_wngage.
+  endif.
 endform.

@@ -24,14 +24,14 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_ARAGE</KEY>
-     <ENTRY>AR review - max.age (days)</ENTRY>
-     <LENGTH>34</LENGTH>
+     <KEY>P_ARMAX</KEY>
+     <ENTRY>AR review - max. age (days)</ENTRY>
+     <LENGTH>35</LENGTH>
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_ARTHD</KEY>
-     <ENTRY>AR review - threshold (days)</ENTRY>
+     <KEY>P_ARWNG</KEY>
+     <ENTRY>AR review - warn. age (days)</ENTRY>
      <LENGTH>36</LENGTH>
     </item>
     <item>
@@ -42,14 +42,14 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_PWAGE</KEY>
-     <ENTRY>Password - max.age (days)</ENTRY>
-     <LENGTH>33</LENGTH>
+     <KEY>P_PWMAX</KEY>
+     <ENTRY>Password - max. age (days)</ENTRY>
+     <LENGTH>34</LENGTH>
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_PWTHD</KEY>
-     <ENTRY>Password - threshold (days)</ENTRY>
+     <KEY>P_PWWNG</KEY>
+     <ENTRY>Password - warn. age (days)</ENTRY>
      <LENGTH>35</LENGTH>
     </item>
    </TPOOL>
