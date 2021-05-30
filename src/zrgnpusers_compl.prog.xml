@@ -30,9 +30,21 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_AR</KEY>
+     <ENTRY>Access Review</ENTRY>
+     <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_DATA</KEY>
      <ENTRY>Download data</ENTRY>
      <LENGTH>21</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_DIR</KEY>
+     <ENTRY>Directory</ENTRY>
+     <LENGTH>17</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -42,15 +54,15 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_FORM</KEY>
-     <ENTRY>Download template</ENTRY>
-     <LENGTH>31</LENGTH>
+     <KEY>P_FNAME</KEY>
+     <ENTRY>File name</ENTRY>
+     <LENGTH>17</LENGTH>
     </item>
     <item>
      <ID>S</ID>
      <KEY>P_OPEN</KEY>
-     <ENTRY>Open template</ENTRY>
-     <LENGTH>21</LENGTH>
+     <ENTRY>Open report template</ENTRY>
+     <LENGTH>28</LENGTH>
     </item>
     <item>
      <ID>S</ID>
@@ -60,15 +72,9 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_UAR</KEY>
-     <ENTRY>Access Review</ENTRY>
+     <KEY>P_TEMPL</KEY>
+     <ENTRY>Download report template</ENTRY>
      <LENGTH>32</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_WDIR</KEY>
-     <ENTRY>Working directory</ENTRY>
-     <LENGTH>25</LENGTH>
     </item>
    </TPOOL>
   </asx:values>
