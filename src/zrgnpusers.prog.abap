@@ -4,7 +4,7 @@
 *&
 *&---------------------------------------------------------------------*
 report zrgnpusers.
-* Samples: BDSFIND_1, SALV_DEMO_METADATA
+* Samples: BDSFIND_1, SALV_DEMO_METADATA ffff
 
 include <color>.
 include <icon>.
